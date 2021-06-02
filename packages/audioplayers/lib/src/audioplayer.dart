@@ -164,6 +164,7 @@ class AudioPlayer {
     // position must be null by default to be compatible with radio streams
     Duration? position,
     bool respectSilence = false,
+    bool fromAndroidRes = false,
     bool stayAwake = false,
     bool duckAudio = false,
     bool recordingActive = false,
@@ -179,6 +180,7 @@ class AudioPlayer {
         'stayAwake': stayAwake,
         'duckAudio': duckAudio,
         'recordingActive': recordingActive,
+        'fromAndroidRes': fromAndroidRes,
       },
     );
 

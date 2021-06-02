@@ -35,6 +35,13 @@ class AudioCache {
   /// Your files will be found at <prefix><fileName> (so the trailing slash is crucial).
   String prefix;
 
+  /// This is flag to use sound from android/res folder
+  ///
+  /// if this set to true. will ignore prefix props
+  ///
+  /// Only work for android !
+  bool fromAndroidRes;
+
   /// This is an instance of AudioPlayer that, if present, will always be used.
   ///
   /// If not set, the AudioCache will create and return a new instance of AudioPlayer every call, allowing for simultaneous calls.
@@ -58,6 +65,7 @@ class AudioCache {
     this.fixedPlayer,
     this.respectSilence = false,
     this.duckAudio = false,
+    this.fromAndroidRes = false,
   });
 
   /// Clears the cache for the file [fileName].
@@ -156,7 +164,7 @@ class AudioCache {
     bool recordingActive = false,
     bool? duckAudio,
   }) async {
-    final uri = await load(fileName);
+    final uri = fromAndroidRes ? fileName : await load(fileName);
     final player = _player(mode);
     if (fixedPlayer != null) {
       await player.setReleaseMode(ReleaseMode.STOP);
@@ -168,6 +176,7 @@ class AudioCache {
       stayAwake: stayAwake,
       recordingActive: recordingActive,
       duckAudio: duckAudio ?? this.duckAudio,
+      fromAndroidRes: fromAndroidRes,
     );
     return player;
   }

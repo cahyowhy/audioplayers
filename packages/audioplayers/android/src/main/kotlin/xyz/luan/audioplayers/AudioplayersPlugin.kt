@@ -44,8 +44,13 @@ class AudioplayersPlugin : MethodCallHandler, FlutterPlugin {
         val player = getPlayer(playerId, mode)
         when (call.method) {
             "play" -> {
-                val url = call.argument<String>("url") !!
+                var url = call.argument<String>("url")!!
                 val isLocal = call.argument<Boolean>("isLocal") ?: false
+                val fromAndroidRes = call.argument<Boolean>("fromAndroidRes") ?: false
+
+                if (isLocal && fromAndroidRes) {
+                    url = "android.resource://com.example.re_planner/" + url
+                }
 
                 val volume = call.argument<Double>("volume") ?: 1.0
                 val position = call.argument<Int>("position")
@@ -90,12 +95,13 @@ class AudioplayersPlugin : MethodCallHandler, FlutterPlugin {
                 player.setVolume(volume)
             }
             "setUrl" -> {
-                val url = call.argument<String>("url") !!
+                val url = call.argument<String>("url")!!
                 val isLocal = call.argument<Boolean>("isLocal") ?: false
                 player.setUrl(url, isLocal)
             }
             "setPlaybackRate" -> {
-                val rate = call.argument<Double>("playbackRate") ?: throw error("playbackRate is required")
+                val rate = call.argument<Double>("playbackRate")
+                        ?: throw error("playbackRate is required")
                 player.setRate(rate)
             }
             "getDuration" -> {
@@ -107,12 +113,14 @@ class AudioplayersPlugin : MethodCallHandler, FlutterPlugin {
                 return
             }
             "setReleaseMode" -> {
-                val releaseModeName = call.argument<String>("releaseMode") ?: throw error("releaseMode is required")
+                val releaseModeName = call.argument<String>("releaseMode")
+                        ?: throw error("releaseMode is required")
                 val releaseMode = ReleaseMode.valueOf(releaseModeName.substring("ReleaseMode.".length))
                 player.setReleaseMode(releaseMode)
             }
             "earpieceOrSpeakersToggle" -> {
-                val playingRoute = call.argument<String>("playingRoute") ?: throw error("playingRoute is required")
+                val playingRoute = call.argument<String>("playingRoute")
+                        ?: throw error("playingRoute is required")
                 player.setPlayingRoute(playingRoute)
             }
             else -> {
@@ -142,7 +150,8 @@ class AudioplayersPlugin : MethodCallHandler, FlutterPlugin {
     }
 
     fun handleDuration(player: Player) {
-        channel.invokeMethod("audio.onDuration", buildArguments(player.playerId, player.getDuration() ?: 0))
+        channel.invokeMethod("audio.onDuration", buildArguments(player.playerId, player.getDuration()
+                ?: 0))
     }
 
     fun handleCompletion(player: Player) {
